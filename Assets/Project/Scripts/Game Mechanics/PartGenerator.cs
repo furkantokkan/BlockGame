@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,14 +26,20 @@ public class PartGenerator : MonoBehaviour
 
         for (int i = 0; i < regionAmount; i++)
         {
-            GameObject newObject = new GameObject();
-            newObject.name = "Pice " + i.ToString();
-            SpriteRenderer sr = newObject.AddComponent<SpriteRenderer>();
+            GameObject parentObject = new GameObject();
+            GameObject newpice = new GameObject();
+            newpice.name = "Pice " + i.ToString();
+            parentObject.name = "Parent " + i.ToString();
+            SpriteRenderer sr = newpice.AddComponent<SpriteRenderer>();
             sr.sprite = parts[i];
             sr.sortingOrder = 1;
-            newObject.transform.position = GameManager.Instance.spawnPositionOnBoard;
-            newObject.transform.localScale = GetScaleAccordingToBoardSize(GameManager.Instance.gridAmount);
-            GameManager.Instance.generatedPices.Add(newObject);
+            newpice.transform.position = GameManager.Instance.spawnPositionOnBoard;
+            newpice.transform.localScale = GetScaleAccordingToBoardSize(GameManager.Instance.gridAmount);
+            newpice.AddComponent<PolygonCollider2D>();
+            newpice.AddComponent<GamePice>();
+            parentObject.transform.position = newpice.GetComponent<PolygonCollider2D>().bounds.center;
+            newpice.transform.SetParent(parentObject.transform);
+            GameManager.Instance.generatedPices.Add(newpice);
         }
     }
     private void GenerateParts()
@@ -46,8 +53,8 @@ public class PartGenerator : MonoBehaviour
 
         for (int i = 0; i < regionAmount; i++)
         {
-            centroids[i] = new Vector2Int(Random.Range(0, imageDim.x), Random.Range(0, imageDim.y));
-            regions[i] = GameManager.Instance.GetColorFromColorArray(i, true);
+            centroids[i] = new Vector2Int(UnityEngine.Random.Range(0, imageDim.x), UnityEngine.Random.Range(0, imageDim.y));
+            regions[i] = GameManager.Instance.GetColorFromColorArray(i);
             regionPixels.Add(new Color[imageDim.x * imageDim.y]);
         }
         for (int x = 0; x < imageDim.x; x++)
@@ -84,7 +91,7 @@ public class PartGenerator : MonoBehaviour
         for (int i = 0; i < regionAmount; i++)
         {
             Texture2D tex = new Texture2D(imageDim.x, imageDim.y);
-            tex.filterMode = FilterMode.Bilinear;
+            tex.filterMode = FilterMode.Point;
             tex.SetPixels(pixelColors[i]);
             tex.Apply();
             piceTextures.Add(tex);
@@ -107,6 +114,16 @@ public class PartGenerator : MonoBehaviour
 
     private Vector3 GetScaleAccordingToBoardSize(int gridAmount)
     {
-        return new Vector3(0.85f, 0.85f, 0f);
+        switch (gridAmount)
+        {
+            case 4:
+                return new Vector3(0.6f, 0.6f, 0.6f);
+            case 5:
+                return new Vector3(0.71f, 0.71f, 0.71f);
+            case 6:
+                return new Vector3(0.85f, 0.85f, 0.85f);
+            default:
+                throw new NullReferenceException("Check the grid amount");
+        }
     }
 }

@@ -7,12 +7,13 @@ public class GameManager : MonoSingleton<GameManager>
     [Header("Settings")]
     [Range(4, 6)] public int gridAmount = 4;
     [Range(5, 12)] public int piceAmount = 5;
+    [SerializeField] private bool useRandomColors = true;
     [SerializeField] private Color[] colors;
     public Vector3 spawnPositionOnBoard = new Vector3(0f, 1.450012f, 0f);
     [Header("Referances")]
     public List<GameObject> generatedPices = new List<GameObject>();
     public Transform gridTrnasform = null;
-
+    public Transform[,] dots;
     private List<int> selectedIndex = new List<int>();
 
     void Start()
@@ -26,9 +27,9 @@ public class GameManager : MonoSingleton<GameManager>
 
     }
 
-    public Color GetColorFromColorArray(int index, bool randomColor)
+    public Color GetColorFromColorArray(int index)
     {
-        if (randomColor && colors.Length > 0 && index < colors.Length)
+        if (useRandomColors && colors.Length > 0 && index < colors.Length)
         {
             int randomIndex = Random.Range(0, colors.Length);
 
@@ -50,7 +51,7 @@ public class GameManager : MonoSingleton<GameManager>
                 return colors[randomIndex];
             }
         }
-        else if (!randomColor && colors.Length > 0 && index < colors.Length)
+        else if (!useRandomColors && colors.Length > 0 && index < colors.Length)
         {
             return colors[index];
         }
