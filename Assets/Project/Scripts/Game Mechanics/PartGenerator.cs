@@ -36,6 +36,7 @@ public class PartGenerator : MonoBehaviour, IInitializeable
             newOrgin.transform.position = closeDot.position;
             pice.transform.SetParent(newOrgin.transform);
             pice.Inithialize(gridAmount, closeDot);
+            newOrgin.transform.position = GameManager.Instance.gridTrnasform.position + Vector3.up * 3.8f;
             GameManager.Instance.generatedPieces.Add(newObject);
         }
     }

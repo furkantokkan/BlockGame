@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ public class GameManager : MonoSingleton<GameManager>
     public Vector3 spawnPositionOnBoard = new Vector3(0f, 1.450012f, 0f);
     [Header("Referances")]
     public List<GameObject> generatedPieces = new List<GameObject>();
+    [SerializeField] private Transform piceSpawnArea;
     public Transform gridTrnasform = null;
     public Transform[,] dots;
     private List<int> selectedIndex = new List<int>();
@@ -31,6 +33,19 @@ public class GameManager : MonoSingleton<GameManager>
         {
             ýnitializeables[i].Initialize(piceAmount, gridAmount, spawnPositionOnBoard);
             yield return new WaitForEndOfFrame();
+        }
+
+        ShufflePice();
+    }
+    private void ShufflePice()
+    {
+        BoxCollider2D col = piceSpawnArea.GetComponent<BoxCollider2D>();
+
+        for (int i = 0; i < piceAmount; i++)
+        {
+            float screenX = Random.Range(col.bounds.min.x, col.bounds.max.x);
+            float screenY = Random.Range(col.bounds.min.y, col.bounds.max.y);
+            generatedPieces[i].transform.parent.DOMove(new Vector2(screenX, screenY), 1.2f, false);
         }
     }
     public Color GetColorFromColorArray(int index)
