@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridGenerator : MonoBehaviour
+public class GridGenerator : MonoBehaviour, IInitializeable
 {
     [Header("Referances")]
     [SerializeField] private Sprite[] grids;
@@ -11,20 +11,18 @@ public class GridGenerator : MonoBehaviour
     private SpriteRenderer boardRenderer;
 
     private readonly int firstGridAmount = 4;
-
-    private void Awake()
+    public int Priority()
+    {
+        return 0;
+    }
+    public void Initialize(int piceAmount, int gridSize, Vector3 spawnPos)
     {
         boardRenderer = GetComponentInChildren<SpriteRenderer>();
-    }
-
-    void Start()
-    {
-        boardRenderer.sprite = grids[GameManager.Instance.gridAmount - firstGridAmount];
+        boardRenderer.sprite = grids[gridSize - firstGridAmount];
         boardRenderer.sortingOrder = 0;
-        boardRenderer.transform.position = GameManager.Instance.spawnPositionOnBoard;
-        int gridAmount = GameManager.Instance.gridAmount;
-        GenerateDots(gridAmount);
-        boardRenderer.transform.localScale = GetBoardSizeAcordingToGridAmount(gridAmount);
+        boardRenderer.transform.position = spawnPos;
+        GenerateDots(gridSize);
+        boardRenderer.transform.localScale = GetBoardSizeAcordingToGridSize(gridSize);
         GameManager.Instance.gridTrnasform = boardRenderer.transform;
     }
     private void GenerateDots(int gridAmount)
@@ -58,7 +56,7 @@ public class GridGenerator : MonoBehaviour
                 throw new NullReferenceException("Check the grid amount");
         }
     }
-    private Vector2 GetBoardSizeAcordingToGridAmount(int gridAmount)
+    private Vector2 GetBoardSizeAcordingToGridSize(int gridAmount)
     {
         switch (gridAmount)
         {

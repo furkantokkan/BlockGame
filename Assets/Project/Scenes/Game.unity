@@ -279,7 +279,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.18039216, g: 0.20392159, b: 0.23137257, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -306,7 +306,7 @@ Camera:
   m_TargetDisplay: 0
   m_TargetEye: 0
   m_HDR: 1
-  m_AllowMSAA: 0
+  m_AllowMSAA: 1
   m_AllowDynamicResolution: 0
   m_ForceIntoRT: 0
   m_OcclusionCulling: 0
@@ -561,7 +561,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b8f941c55e437842b4243a05af5870f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridAmount: 6
+  gridAmount: 4
   piceAmount: 8
   useRandomColors: 1
   colors:
@@ -580,6 +580,8 @@ MonoBehaviour:
   spawnPositionOnBoard: {x: 0, y: 1.450012, z: 0}
   generatedPices: []
   gridTrnasform: {fileID: 408303730}
+  partGenerator: {fileID: 1566324799}
+  gridGenerator: {fileID: 1637642462}
 --- !u!4 &1922684744
 Transform:
   m_ObjectHideFlags: 0

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoSingleton<GameManager>
@@ -11,22 +12,25 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] private Color[] colors;
     public Vector3 spawnPositionOnBoard = new Vector3(0f, 1.450012f, 0f);
     [Header("Referances")]
-    public List<GameObject> generatedPices = new List<GameObject>();
+    public List<GameObject> generatedPieces = new List<GameObject>();
     public Transform gridTrnasform = null;
     public Transform[,] dots;
     private List<int> selectedIndex = new List<int>();
-
-    void Start()
+    private List<IInitializeable> ýnitializeables = new List<IInitializeable>();
+    private void Awake()
     {
-
+        ýnitializeables.AddRange(FindObjectsOfType<MonoBehaviour>().OfType<IInitializeable>());
     }
-
-    // Update is called once per frame
-    void Update()
+    private IEnumerator Start()
     {
+        ýnitializeables = ýnitializeables.OrderBy(x => x.Priority()).ToList();
 
+        for (int i = 0; i < ýnitializeables.Count; i++)
+        {
+            ýnitializeables[i].Initialize(piceAmount, gridAmount, spawnPositionOnBoard);
+            yield return new WaitForEndOfFrame();
+        }
     }
-
     public Color GetColorFromColorArray(int index)
     {
         if (useRandomColors && colors.Length > 0 && index < colors.Length)

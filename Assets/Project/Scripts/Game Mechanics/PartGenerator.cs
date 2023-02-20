@@ -3,55 +3,52 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PartGenerator : MonoBehaviour
+public class PartGenerator : MonoBehaviour, IInitializeable
 {
     [SerializeField] private Vector2Int imageDim;
-
-    private int regionAmount;
-
-    private List<Sprite> parts = new List<Sprite>();
+    private int piceAmount;
+    private int gridAmount;
 
     private List<Color[]> regionPixels = new List<Color[]>();
 
 
-    private void Start()
+    public void Initialize(int newPiceAmount, int newGridSize, Vector3 spawnPos)
     {
-        regionAmount = GameManager.Instance.piceAmount;
-        SpawnTheParts();
-    }
+        piceAmount = newPiceAmount;
+        gridAmount = newGridSize;
+        List<Sprite> parts = GetParts();
 
-    private void SpawnTheParts()
-    {
-        GenerateParts();
-
-        for (int i = 0; i < regionAmount; i++)
+        for (int i = 0; i < piceAmount; i++)
         {
-            GameObject parentObject = new GameObject();
-            GameObject newpice = new GameObject();
-            newpice.name = "Pice " + i.ToString();
-            parentObject.name = "Parent " + i.ToString();
-            SpriteRenderer sr = newpice.AddComponent<SpriteRenderer>();
+            GameObject newObject = new GameObject();
+            GameObject newOrgin = new GameObject();
+            newOrgin.name = "Pice Orgin " + i.ToString();
+            newObject.name = "Pice " + i.ToString();
+            newObject.layer = LayerMask.NameToLayer("Pice"); 
+            SpriteRenderer sr = newObject.AddComponent<SpriteRenderer>();
             sr.sprite = parts[i];
             sr.sortingOrder = 1;
-            newpice.transform.position = GameManager.Instance.spawnPositionOnBoard;
-            newpice.transform.localScale = GetScaleAccordingToBoardSize(GameManager.Instance.gridAmount);
-            newpice.AddComponent<PolygonCollider2D>();
-            newpice.AddComponent<GamePice>();
-            parentObject.transform.position = newpice.GetComponent<PolygonCollider2D>().bounds.center;
-            newpice.transform.SetParent(parentObject.transform);
-            GameManager.Instance.generatedPices.Add(newpice);
+            newObject.transform.position = spawnPos;
+            newObject.transform.localScale = GetScaleAccordingToBoardSize(gridAmount);
+            PolygonCollider2D col = newObject.AddComponent<PolygonCollider2D>();
+            GamePice pice = newObject.AddComponent<GamePice>();
+            Transform closeDot = FindCloseDot(new Vector2(col.bounds.center.x, col.bounds.center.y), gridAmount);
+            newOrgin.transform.position = closeDot.position;
+            pice.transform.SetParent(newOrgin.transform);
+            pice.Inithialize();
+            GameManager.Instance.generatedPieces.Add(newObject);
         }
     }
-    private void GenerateParts()
+    public int Priority()
     {
-        parts.AddRange(GetParts());
+        return 1;
     }
     List<Sprite> GetParts()
     {
-        Vector2Int[] centroids = new Vector2Int[regionAmount];
-        Color[] regions = new Color[regionAmount];
+        Vector2Int[] centroids = new Vector2Int[piceAmount];
+        Color[] regions = new Color[piceAmount];
 
-        for (int i = 0; i < regionAmount; i++)
+        for (int i = 0; i < piceAmount; i++)
         {
             centroids[i] = new Vector2Int(UnityEngine.Random.Range(0, imageDim.x), UnityEngine.Random.Range(0, imageDim.y));
             regions[i] = GameManager.Instance.GetColorFromColorArray(i);
@@ -88,7 +85,7 @@ public class PartGenerator : MonoBehaviour
     {
         List<Texture2D> piceTextures = new List<Texture2D>();
 
-        for (int i = 0; i < regionAmount; i++)
+        for (int i = 0; i < piceAmount; i++)
         {
             Texture2D tex = new Texture2D(imageDim.x, imageDim.y);
             tex.filterMode = FilterMode.Point;
@@ -125,5 +122,26 @@ public class PartGenerator : MonoBehaviour
             default:
                 throw new NullReferenceException("Check the grid amount");
         }
+    }
+    private Transform FindCloseDot(Vector2 orgin, int gridAmount)
+    {
+        float oldDistance = float.MaxValue;
+        Transform result = null;
+
+        for (int y = 0; y < gridAmount; y++)
+        {
+            for (int x = 0; x < gridAmount; x++)
+            {
+                Transform newDot = GameManager.Instance.dots[x, y].transform;
+                float dist = Vector2.Distance(orgin, newDot.position);
+                if (dist < oldDistance)
+                {
+                    result = newDot;
+                    oldDistance = dist;
+                }
+            }
+        }
+
+        return result;
     }
 }
