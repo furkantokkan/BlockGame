@@ -5,16 +5,32 @@ using UnityEngine;
 
 public class GamePice : MonoBehaviour
 {
+    public bool waitingOnRightPlace = false;
+
     private Transform parentOrgin;
     private SpriteRenderer renderer;
+    private Transform target;
 
     private PolygonCollider2D polygonCollider;
 
-    public void Inithialize()
+    private int gridAmount;
+
+    private float minX;
+    private float maxX;
+    private float minY;
+    private float maxY;
+
+    public void Inithialize(int newGridAmount, Transform rightPlace)
     {
         polygonCollider = GetComponent<PolygonCollider2D>();
         parentOrgin = transform.parent;
         renderer = GetComponent<SpriteRenderer>();
+        gridAmount = newGridAmount;
+        minX = GameManager.Instance.minX;
+        maxX = GameManager.Instance.maxX;
+        minY = GameManager.Instance.minY;
+        maxY = GameManager.Instance.maxY;
+        target = rightPlace;
     }
     public Transform GetParentTransform()
     {
@@ -38,6 +54,21 @@ public class GamePice : MonoBehaviour
         for (int i = 0; i < newColliders.Count; i++)
         {
             newColliders[i].GetComponent<SpriteRenderer>().sortingOrder = i + 1;
+        }
+
+        if (PiceIsInTheRightPlace() && isPiceInsideOfGrid())
+        {
+            Snap();
+            waitingOnRightPlace = true;
+        }
+        else if (CheckTheOverlapingPieces(false).Count <= 0 && isPiceInsideOfGrid())
+        {
+            Snap();
+            waitingOnRightPlace = PiceIsInTheRightPlace();
+        }
+        else
+        {
+            waitingOnRightPlace = false;
         }
     }
     public void ResetShortingOrrder()
@@ -68,5 +99,53 @@ public class GamePice : MonoBehaviour
 
 
         return colliders;
+    }
+    private bool isPiceInsideOfGrid()
+    {
+        if (parentOrgin.position.x > minX &&
+            parentOrgin.position.x < maxX &&
+            parentOrgin.position.y < maxY &&
+            parentOrgin.position.y > minY)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    public bool PiceIsInTheRightPlace()
+    {
+        Transform closeDot = FindCloseDot(parentOrgin.transform.position, gridAmount);
+
+        if (closeDot == target)
+        {
+            return true;
+        }
+ 
+        return false;
+    }
+    private void Snap()
+    {
+        parentOrgin.transform.position = FindCloseDot(parentOrgin.transform.position, gridAmount).position;
+    }
+    public Transform FindCloseDot(Vector2 orgin, int gridAmount)
+    {
+        float oldDistance = float.MaxValue;
+        Transform result = null;
+
+        for (int y = 0; y < gridAmount; y++)
+        {
+            for (int x = 0; x < gridAmount; x++)
+            {
+                Transform newDot = GameManager.Instance.dots[x, y].transform;
+                float dist = Vector2.Distance(orgin, newDot.position);
+                if (dist < oldDistance)
+                {
+                    result = newDot;
+                    oldDistance = dist;
+                }
+            }
+        }
+
+        return result;
     }
 }

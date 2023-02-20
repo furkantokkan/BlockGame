@@ -17,6 +17,8 @@ public class GameManager : MonoSingleton<GameManager>
     public Transform[,] dots;
     private List<int> selectedIndex = new List<int>();
     private List<IInitializeable> ýnitializeables = new List<IInitializeable>();
+
+    [HideInInspector] public float minX, maxX, minY, maxY;
     private void Awake()
     {
         ýnitializeables.AddRange(FindObjectsOfType<MonoBehaviour>().OfType<IInitializeable>());

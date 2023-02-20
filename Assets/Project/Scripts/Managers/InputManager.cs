@@ -42,21 +42,22 @@ public class InputManager : MonoBehaviour
     public void ScreenMouseRay()
     {
 
-        RaycastHit2D[] hits = Physics2D.RaycastAll(MouseWorldPosition(), Vector2.zero, 1  << LayerMask.NameToLayer("Pice"));
+        RaycastHit2D[] hits = Physics2D.RaycastAll(MouseWorldPosition(), Vector2.zero, 1 << LayerMask.NameToLayer("Pice"));
 
         List<RaycastHit2D> hitsList = new List<RaycastHit2D>();
         hitsList.AddRange(hits);
         hitsList = hitsList.OrderByDescending(x => x.transform.GetComponent<SpriteRenderer>().sortingOrder).ToList();
 
-        if (hitsList[0].transform.TryGetComponent<GamePice>(out GamePice pice) && !isHitPice)
+        if (hitsList.Count > 0)
         {
-            Debug.Log(hits[0].transform.name);
-            piceOnDrag = pice;
-            isHitPice = true;
+            if (hitsList[0].transform.TryGetComponent<GamePice>(out GamePice pice) && !isHitPice)
+            {
+                Debug.Log(hits[0].transform.name);
+                piceOnDrag = pice;
+                isHitPice = true;
+            }
         }
-
     }
-
     Vector3 MouseWorldPosition()
     {
         var mouseScreenPos = Input.mousePosition;

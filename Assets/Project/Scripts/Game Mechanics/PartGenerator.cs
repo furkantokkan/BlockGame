@@ -32,10 +32,10 @@ public class PartGenerator : MonoBehaviour, IInitializeable
             newObject.transform.localScale = GetScaleAccordingToBoardSize(gridAmount);
             PolygonCollider2D col = newObject.AddComponent<PolygonCollider2D>();
             GamePice pice = newObject.AddComponent<GamePice>();
-            Transform closeDot = FindCloseDot(new Vector2(col.bounds.center.x, col.bounds.center.y), gridAmount);
+            Transform closeDot = pice.FindCloseDot(new Vector2(col.bounds.center.x, col.bounds.center.y), gridAmount);
             newOrgin.transform.position = closeDot.position;
             pice.transform.SetParent(newOrgin.transform);
-            pice.Inithialize();
+            pice.Inithialize(gridAmount, closeDot);
             GameManager.Instance.generatedPieces.Add(newObject);
         }
     }
@@ -123,25 +123,5 @@ public class PartGenerator : MonoBehaviour, IInitializeable
                 throw new NullReferenceException("Check the grid amount");
         }
     }
-    private Transform FindCloseDot(Vector2 orgin, int gridAmount)
-    {
-        float oldDistance = float.MaxValue;
-        Transform result = null;
-
-        for (int y = 0; y < gridAmount; y++)
-        {
-            for (int x = 0; x < gridAmount; x++)
-            {
-                Transform newDot = GameManager.Instance.dots[x, y].transform;
-                float dist = Vector2.Distance(orgin, newDot.position);
-                if (dist < oldDistance)
-                {
-                    result = newDot;
-                    oldDistance = dist;
-                }
-            }
-        }
-
-        return result;
-    }
+   
 }

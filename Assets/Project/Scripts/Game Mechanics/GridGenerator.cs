@@ -7,6 +7,8 @@ public class GridGenerator : MonoBehaviour, IInitializeable
 {
     [Header("Referances")]
     [SerializeField] private Sprite[] grids;
+    [SerializeField] private Transform cornerX;
+    [SerializeField] private Transform cornerY;
 
     private SpriteRenderer boardRenderer;
 
@@ -24,6 +26,10 @@ public class GridGenerator : MonoBehaviour, IInitializeable
         GenerateDots(gridSize);
         boardRenderer.transform.localScale = GetBoardSizeAcordingToGridSize(gridSize);
         GameManager.Instance.gridTrnasform = boardRenderer.transform;
+        GameManager.Instance.minX = cornerX.position.x;
+        GameManager.Instance.maxX = -cornerX.position.x;
+        GameManager.Instance.minY = cornerX.position.y;
+        GameManager.Instance.maxY = cornerY.position.y;
     }
     private void GenerateDots(int gridAmount)
     {
