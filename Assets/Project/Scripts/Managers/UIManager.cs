@@ -19,6 +19,7 @@ public class UIManager : MonoSingleton<UIManager>
     }
     public void NextLevelButton()
     {
+        GameManager.Instance.SaveTheNextLevel();
         SceneManager.LoadScene(0);
     }
     public void RestartButton()

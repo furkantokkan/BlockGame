@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class GameManager : MonoSingleton<GameManager>
 {
+    [Header("Level Settins")]
+    public List<ServerData.Data> defaultLevelData = new List<ServerData.Data>();
+    public bool overrideDefaultLevelData = false;
     [Header("Settings")]
     [Range(4, 6)] public int gridAmount = 4;
     [Range(5, 12)] public int piceAmount = 5;
@@ -22,6 +25,9 @@ public class GameManager : MonoSingleton<GameManager>
     private List<int> selectedIndex = new List<int>();
     private List<IInitializeable> ýnitializeables = new List<IInitializeable>();
 
+    private int levelIndex = 0;
+    private readonly string LevelKey = "LEVEL";
+
     public Action onCheckGameHadDone;
 
     [HideInInspector] public float minX, maxX, minY, maxY;
@@ -31,6 +37,11 @@ public class GameManager : MonoSingleton<GameManager>
     }
     private IEnumerator Start()
     {
+        yield return new WaitUntil(() => ServerData.serverIsResponded);
+
+        levelIndex = PlayerPrefs.GetInt(LevelKey, 0);
+        SetLevelData();
+
         onCheckGameHadDone += OnCheckGameHasDone;
         ýnitializeables = ýnitializeables.OrderBy(x => x.Priority()).ToList();
 
@@ -45,6 +56,34 @@ public class GameManager : MonoSingleton<GameManager>
     private void OnDisable()
     {
         onCheckGameHadDone -= OnCheckGameHasDone;
+    }
+    private void SetLevelData()
+    {
+        if (ServerData.serverListData.Count > 0)
+        {
+            if (levelIndex > ServerData.serverListData.Count)
+            {
+                ResetTheLevelSave();
+            }
+
+            gridAmount = ServerData.serverListData[levelIndex].gridAmount;
+            piceAmount = ServerData.serverListData[levelIndex].piceAmount;
+        }
+        else
+        {
+            if (defaultLevelData.Count > 0)
+            {
+
+                if (levelIndex > defaultLevelData.Count)
+                {
+                    ResetTheLevelSave();
+                }
+
+                gridAmount = defaultLevelData[levelIndex].gridAmount;
+                piceAmount = defaultLevelData[levelIndex].piceAmount;
+                Debug.Log("Grid Amount: " + gridAmount);
+            }
+        }
     }
     private void ShufflePice()
     {
@@ -108,5 +147,16 @@ public class GameManager : MonoSingleton<GameManager>
 
 
         return new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), 1f);
+    }
+    public void SaveTheNextLevel()
+    {
+        levelIndex++;
+        PlayerPrefs.SetInt(LevelKey, levelIndex);
+    }
+    [ContextMenu("Reset Level")]
+    public void ResetTheLevelSave()
+    {
+        levelIndex = 0;
+        PlayerPrefs.SetInt(LevelKey, levelIndex);
     }
 }
