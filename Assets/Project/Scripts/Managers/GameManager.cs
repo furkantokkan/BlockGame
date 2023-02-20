@@ -61,7 +61,7 @@ public class GameManager : MonoSingleton<GameManager>
     {
         if (ServerData.serverListData.Count > 0)
         {
-            if (levelIndex > ServerData.serverListData.Count)
+            if (levelIndex >= ServerData.serverListData.Count)
             {
                 ResetTheLevelSave();
             }
@@ -74,14 +74,13 @@ public class GameManager : MonoSingleton<GameManager>
             if (defaultLevelData.Count > 0)
             {
 
-                if (levelIndex > defaultLevelData.Count)
+                if (levelIndex >= defaultLevelData.Count)
                 {
                     ResetTheLevelSave();
                 }
 
                 gridAmount = defaultLevelData[levelIndex].gridAmount;
                 piceAmount = defaultLevelData[levelIndex].piceAmount;
-                Debug.Log("Grid Amount: " + gridAmount);
             }
         }
     }
