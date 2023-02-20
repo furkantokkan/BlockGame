@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] private bool useRandomColors = true;
     [SerializeField] private Color[] colors;
     public Vector3 spawnPositionOnBoard = new Vector3(0f, 1.450012f, 0f);
+    public bool gameHasWon = false;
     [Header("Referances")]
     public List<GameObject> generatedPieces = new List<GameObject>();
     [SerializeField] private Transform piceSpawnArea;
@@ -20,6 +22,8 @@ public class GameManager : MonoSingleton<GameManager>
     private List<int> selectedIndex = new List<int>();
     private List<IInitializeable> ýnitializeables = new List<IInitializeable>();
 
+    public Action onCheckGameHadDone;
+
     [HideInInspector] public float minX, maxX, minY, maxY;
     private void Awake()
     {
@@ -27,6 +31,7 @@ public class GameManager : MonoSingleton<GameManager>
     }
     private IEnumerator Start()
     {
+        onCheckGameHadDone += OnCheckGameHasDone;
         ýnitializeables = ýnitializeables.OrderBy(x => x.Priority()).ToList();
 
         for (int i = 0; i < ýnitializeables.Count; i++)
@@ -37,28 +42,52 @@ public class GameManager : MonoSingleton<GameManager>
 
         ShufflePice();
     }
+    private void OnDisable()
+    {
+        onCheckGameHadDone -= OnCheckGameHasDone;
+    }
     private void ShufflePice()
     {
         BoxCollider2D col = piceSpawnArea.GetComponent<BoxCollider2D>();
 
         for (int i = 0; i < piceAmount; i++)
         {
-            float screenX = Random.Range(col.bounds.min.x, col.bounds.max.x);
-            float screenY = Random.Range(col.bounds.min.y, col.bounds.max.y);
-            generatedPieces[i].transform.parent.DOMove(new Vector2(screenX, screenY), 1.2f, false);
+            float screenX = UnityEngine.Random.Range(col.bounds.min.x, col.bounds.max.x);
+            float screenY = UnityEngine.Random.Range(col.bounds.min.y, col.bounds.max.y);
+            generatedPieces[i].transform.parent.DOMove(new Vector2(screenX, screenY), 1f, false).SetEase(Ease.Linear);
         }
+    }
+    private void OnCheckGameHasDone()
+    {
+        gameHasWon = CheckForGameHasDone();
+        if (gameHasWon)
+        {
+            UIManager.Instance.UpdateUI();
+        }
+    }
+    private bool CheckForGameHasDone()
+    {
+        foreach (GameObject item in generatedPieces)
+        {
+            if (!item.GetComponent<GamePice>().waitingOnRightPlace)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
     public Color GetColorFromColorArray(int index)
     {
         if (useRandomColors && colors.Length > 0 && index < colors.Length)
         {
-            int randomIndex = Random.Range(0, colors.Length);
+            int randomIndex = UnityEngine.Random.Range(0, colors.Length);
 
             if (selectedIndex.Contains(randomIndex))
             {
                 do
                 {
-                    randomIndex = Random.Range(0, colors.Length);
+                    randomIndex = UnityEngine.Random.Range(0, colors.Length);
                     if (!selectedIndex.Contains(randomIndex))
                     {
                         selectedIndex.Add(randomIndex);
@@ -78,6 +107,6 @@ public class GameManager : MonoSingleton<GameManager>
         }
 
 
-        return new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f), 1f);
+        return new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), 1f);
     }
 }

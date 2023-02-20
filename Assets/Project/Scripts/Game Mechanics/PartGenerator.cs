@@ -24,7 +24,7 @@ public class PartGenerator : MonoBehaviour, IInitializeable
             GameObject newOrgin = new GameObject();
             newOrgin.name = "Pice Orgin " + i.ToString();
             newObject.name = "Pice " + i.ToString();
-            newObject.layer = LayerMask.NameToLayer("Pice"); 
+            newObject.layer = LayerMask.NameToLayer("Pice");
             SpriteRenderer sr = newObject.AddComponent<SpriteRenderer>();
             sr.sprite = parts[i];
             sr.sortingOrder = 1;
@@ -36,7 +36,7 @@ public class PartGenerator : MonoBehaviour, IInitializeable
             newOrgin.transform.position = closeDot.position;
             pice.transform.SetParent(newOrgin.transform);
             pice.Inithialize(gridAmount, closeDot);
-            newOrgin.transform.position = GameManager.Instance.gridTrnasform.position + Vector3.up * 3.8f;
+            newOrgin.transform.position = GameManager.Instance.gridTrnasform.position + (Vector3.up * 3.8f) + (Vector3.left * UnityEngine.Random.Range(-1.5f, 1.5f));
             GameManager.Instance.generatedPieces.Add(newObject);
         }
     }
@@ -124,5 +124,5 @@ public class PartGenerator : MonoBehaviour, IInitializeable
                 throw new NullReferenceException("Check the grid amount");
         }
     }
-   
+
 }

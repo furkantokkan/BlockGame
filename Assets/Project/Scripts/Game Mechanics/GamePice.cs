@@ -46,7 +46,7 @@ public class GamePice : MonoBehaviour
     }
     public void DragEnd()
     {
-        List<Collider2D> newColliders = CheckTheOverlapingPieces(false).
+        List<Collider2D> newColliders = CheckTheOverlapingPieces(false).Where(x => x.GetComponent<SpriteRenderer>() != null).
             OrderBy(x => x.GetComponent<SpriteRenderer>().sortingOrder).ToList();
 
         renderer.sortingOrder = newColliders.Count + 1;
@@ -70,6 +70,8 @@ public class GamePice : MonoBehaviour
         {
             waitingOnRightPlace = false;
         }
+
+        GameManager.Instance.onCheckGameHadDone?.Invoke();
     }
     public void ResetShortingOrrder()
     {

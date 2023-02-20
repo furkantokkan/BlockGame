@@ -15,6 +15,11 @@ public class InputManager : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance.gameHasWon)
+        {
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             ScreenMouseRay();
@@ -35,8 +40,11 @@ public class InputManager : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
-            piceOnDrag.DragEnd();
-            isHitPice = false;
+            if (piceOnDrag != null)
+            {
+                piceOnDrag.DragEnd();
+                isHitPice = false;
+            }
         }
     }
     public void ScreenMouseRay()
